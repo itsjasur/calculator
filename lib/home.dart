@@ -15,7 +15,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController controller = TextEditingController();
-  late TextSelection _selection;
+
+  List operators = ['+', '-', '%', '÷', '×'];
+  List secondaryOperators = ['(', ')'];
+  List numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
 
   double result = 0;
   // String rawCalc = '';
@@ -23,6 +26,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
+    setState(() {});
   }
 
   @override
@@ -84,7 +89,16 @@ class _HomePageState extends State<HomePage> {
       ],
     ];
 
-    TextStyle style = TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: topSectionFontSize);
+    TextStyle style = TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+      fontSize: topSectionFontSize,
+      fontStyle: FontStyle.normal,
+      letterSpacing: 1.0,
+      wordSpacing: 2.0,
+      textBaseline: TextBaseline.alphabetic,
+      height: 1.0,
+    );
 
     return Scaffold(
       // appBar: AppBar(backgroundColor: Colors.red),
@@ -95,11 +109,13 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.end,
           // crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            SingleChildScrollView(
-              child: Container(
-                alignment: Alignment.bottomLeft,
-                color: Colors.white10,
-                height: topSectionSize,
+            Container(
+              alignment: Alignment.bottomRight,
+              color: Colors.white10,
+              height: topSectionSize,
+              child: SingleChildScrollView(
+                reverse: true,
+                scrollDirection: Axis.vertical,
                 child: TextField(
                   textAlign: TextAlign.right,
                   controller: controller,
@@ -177,8 +193,6 @@ class _HomePageState extends State<HomePage> {
 
                               return MyTap(
                                 onTap: () {
-                                  final operators = ['+', '-', '%', '÷', '×'];
-
                                   // print(controller.value);
                                   if (buttonType == 'numb' || buttonType == 'oper') {
                                     String newchar = buttonOpr.toString();
@@ -187,10 +201,6 @@ class _HomePageState extends State<HomePage> {
                                     int position = currentSelection.baseOffset;
 
                                     String text = controller.text;
-
-                                    text = text.replaceAll(',', '');
-                                    text = text.replaceAll('*', '×');
-                                    text = text.replaceAll('/', '÷');
 
                                     String prefix = text.substring(0, position);
                                     String suffix = text.substring(position, text.length);
@@ -205,6 +215,16 @@ class _HomePageState extends State<HomePage> {
                                       if (operators.contains(last) && operators.contains(newchar)) {
                                         prefix = prefix.substring(0, prefix.length - 1);
                                       }
+
+                                      //adding * if user inputs forward bracket
+                                      if (numbers.contains(last) && newchar == '(') {
+                                        prefix = '$prefix×';
+                                      }
+
+                                      //
+                                      if (operators.contains(last) && newchar == '.') {
+                                        prefix = '${prefix}0';
+                                      }
                                     }
 
                                     //swapping operators
@@ -218,7 +238,7 @@ class _HomePageState extends State<HomePage> {
                                       }
                                     }
 
-                                    if (prefix.isEmpty && buttonType == 'oper') {
+                                    if (prefix.isEmpty && buttonType == 'oper' && !secondaryOperators.contains(buttonOpr) && buttonOpr != '.') {
                                       const snackBar = SnackBar(content: Text('Invalid value'));
                                       ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                       text = suffix;
@@ -227,24 +247,42 @@ class _HomePageState extends State<HomePage> {
                                       text = prefix + newchar + suffix; //adding prefix + button value + suffix
                                     }
 
-                                    int startLength = text.length;
+                                    int startLength = text.length; //length when started
 
+                                    text = text.replaceAll('\n', '');
+                                    text = text.replaceAll('\n\n', '');
                                     text = text.replaceAll(',', ''); //removing commas
-                                    List result = listify(text, operators);
+                                    List operationList = listify(text, operators + secondaryOperators);
 
-                                    text = '';
-                                    for (String i in result) {
-                                      if (operators.contains(i)) {
-                                        text = text + i;
+                                    operationList = _commafy(operationList);
+
+                                    double maxLineWith = (screenWidth - (horPadding * 2)) * 0.7;
+                                    String newText = "";
+                                    String newLine = "";
+                                    double newLineLength = 0;
+                                    for (String operation in operationList) {
+                                      double operationWidth = (measureTextWidth(operation, style));
+
+                                      if (newLineLength > maxLineWith) {
+                                        // if ()
+                                        newText = '$newText$newLine';
+
+                                        if (operators.contains(operation)) {
+                                          print(operation);
+                                          //operators are put at the front of lines
+                                          newLine = '\n$operation';
+                                        } else {
+                                          newLine = '$operation\n';
+                                        }
+
+                                        newLineLength = operationWidth;
                                       } else {
-                                        String result = commafy(int.parse(i));
-                                        text = text + result;
+                                        newLine = newLine + operation;
+                                        newLineLength = newLineLength + operationWidth;
                                       }
                                     }
 
-                                    for (String operator in operators) {
-                                      text = text.replaceAll(operator, '\n$operator');
-                                    }
+                                    text = newText + newLine;
 
                                     controller.text = text;
 
@@ -288,5 +326,33 @@ class _HomePageState extends State<HomePage> {
   void clearAll() {
     controller.text = "";
     controller.selection = const TextSelection.collapsed(offset: 0); // must set cursor ofset 0 after controller.text updates
+  }
+
+  double measureTextWidth(String text, TextStyle style) {
+    final textPainter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      maxLines: 1,
+      textDirection: TextDirection.ltr, // Use appropriate direction if necessary
+    )..layout();
+
+    return textPainter.width;
+  }
+
+  List _commafy(List list) {
+    //adding commas in by formatting
+    List newOperationList = [];
+    for (String i in list) {
+      if (operators.contains(i) || secondaryOperators.contains(i)) {
+        newOperationList.add(i);
+      } else if (i.isNotEmpty) {
+        String result = commafy(double.parse(i));
+        newOperationList.add(result);
+      } else {
+        const snackBar = SnackBar(content: Text('Somethign went wrong'));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
+    }
+
+    return newOperationList;
   }
 }
