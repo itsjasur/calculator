@@ -1,11 +1,6 @@
-import 'package:calculator/main.dart';
 import 'package:calculator/widgets/mytap_widget.dart';
-import 'package:calculator/widgets/test.dart';
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
-
-import 'modals/converters.dart';
-import 'modals/helpers.dart';
+import 'models/helpers.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,29 +12,17 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController controller = TextEditingController();
 
-  List operators = ['+', '-', '%', '÷', '×'];
-  List secondaryOperators = ['(', ')'];
-  List numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+  List operators = ['+', '-', '÷', '×'];
+  List secondaryOperators = ['(', ')', '%'];
 
-  double result = 0;
-  // String rawCalc = '';
+  String? finalResult;
 
   @override
   void initState() {
     super.initState();
 
-    // controller.addListener(_handleCursorChange);
+    // commafy('1231.12321');
   }
-
-  // void _handleCursorChange() {
-  //   TextSelection selection = controller.selection;
-  //   print("Cursor position: ${selection.start}");
-  //   if (selection.isCollapsed) {
-  //     print('No text is selected');
-  //   } else {
-  //     print('Selected text: ${controller.text.substring(selection.start, selection.end)}');
-  //   }
-  // }
 
   @override
   void dispose() {
@@ -59,58 +42,60 @@ class _HomePageState extends State<HomePage> {
 
     final buttonMargin = screenWidth * 0.03;
     final bottomPadding = bottomSection * 0.03;
-    final fontSize = screenHeight * 0.035;
 
-    final topSectionFontSize = screenHeight * 0.023;
-    final resultFontSize = screenHeight * 0.026;
+    final fontSize = screenHeight * 0.034;
+
+    final topSectionFontSize = screenHeight * 0.027;
+
+    final resultFontSize = screenHeight * 0.024;
+
+    Color numberColor = Colors.white70;
 
     final availableHeight = bottomSection - (4 * buttonMargin) - bottomPadding;
     final availableWidth = screenWidth - (2 * horPadding) - (3 * buttonMargin);
 
-    List calculations = [];
-
     List<List<Map>> buttons = [
       [
-        {'type': 'brac', 'content': Text('(', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': '('},
-        {'type': 'brac', 'content': Text(')', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': ')'},
-        {'type': 'oper', 'content': Text('%', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': '%'},
+        {'type': 'brack', 'content': Text('(', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': '('},
+        {'type': 'brack', 'content': Text(')', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': ')'},
+        {'type': 'perc', 'content': Text('%', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': '%'},
         {'type': 'oper', 'content': Text('÷', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': '÷'},
       ],
       [
-        {'type': 'numb', 'content': Text('7', style: TextStyle(fontSize: fontSize, color: Colors.white)), 'operation': '7'},
-        {'type': 'numb', 'content': Text('8', style: TextStyle(fontSize: fontSize, color: Colors.white)), 'operation': '8'},
-        {'type': 'numb', 'content': Text('9', style: TextStyle(fontSize: fontSize, color: Colors.white)), 'operation': '9'},
+        {'type': 'numb', 'content': Text('7', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '7'},
+        {'type': 'numb', 'content': Text('8', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '8'},
+        {'type': 'numb', 'content': Text('9', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '9'},
         {'type': 'oper', 'content': Text('×', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': '×'},
       ],
       [
-        {'type': 'numb', 'content': Text('4', style: TextStyle(fontSize: fontSize, color: Colors.white)), 'operation': '4'},
-        {'type': 'numb', 'content': Text('5', style: TextStyle(fontSize: fontSize, color: Colors.white)), 'operation': '5'},
-        {'type': 'numb', 'content': Text('6', style: TextStyle(fontSize: fontSize, color: Colors.white)), 'operation': '6'},
+        {'type': 'numb', 'content': Text('4', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '4'},
+        {'type': 'numb', 'content': Text('5', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '5'},
+        {'type': 'numb', 'content': Text('6', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '6'},
         {'type': 'oper', 'content': Text('-', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': '-'},
       ],
       [
-        {'type': 'numb', 'content': Text('3', style: TextStyle(fontSize: fontSize, color: Colors.white)), 'operation': '3'},
-        {'type': 'numb', 'content': Text('2', style: TextStyle(fontSize: fontSize, color: Colors.white)), 'operation': '2'},
-        {'type': 'numb', 'content': Text('1', style: TextStyle(fontSize: fontSize, color: Colors.white)), 'operation': '1'},
+        {'type': 'numb', 'content': Text('1', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '1'},
+        {'type': 'numb', 'content': Text('2', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '2'},
+        {'type': 'numb', 'content': Text('3', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '3'},
         {'type': 'oper', 'content': Text('+', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': '+'},
       ],
       [
         {'type': 'clr', 'content': Text('C', style: TextStyle(fontSize: fontSize, color: Colors.red)), 'operation': 'clearAll'},
-        {'type': 'numb', 'content': Text('0', style: TextStyle(fontSize: fontSize, color: Colors.white)), 'operation': '0'},
-        {'type': 'deci', 'content': Text('.', style: TextStyle(fontSize: fontSize, color: Colors.white)), 'operation': '.'},
+        {'type': 'numb', 'content': Text('0', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '0'},
+        {'type': 'deci', 'content': Text('.', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '.'},
         {'type': 'eql', 'content': Text('=', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': '='},
       ],
     ];
 
-    TextStyle style = TextStyle(
-      color: Colors.white,
+    TextStyle calculationStyle = TextStyle(
+      color: Colors.white.withOpacity(0.8),
       fontWeight: FontWeight.bold,
       fontSize: topSectionFontSize,
       fontStyle: FontStyle.normal,
       letterSpacing: 1.0,
       wordSpacing: 2.0,
       textBaseline: TextBaseline.alphabetic,
-      height: 1.0,
+      height: 1.35,
     );
 
     return Scaffold(
@@ -124,7 +109,6 @@ class _HomePageState extends State<HomePage> {
           children: [
             Container(
               alignment: Alignment.bottomRight,
-              color: Colors.white10,
               height: topSectionSize,
               child: SingleChildScrollView(
                 reverse: true,
@@ -134,12 +118,11 @@ class _HomePageState extends State<HomePage> {
                   controller: controller,
                   // readOnly: true,
                   showCursor: true,
-
                   autofocus: true,
                   maxLines: null,
                   keyboardType: TextInputType.none,
                   textInputAction: TextInputAction.newline,
-                  style: style,
+                  style: calculationStyle,
                   decoration: const InputDecoration(
                     contentPadding: EdgeInsets.zero,
                     border: InputBorder.none,
@@ -150,16 +133,18 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Container(
-              height: screenHeight * 0.05,
+              height: screenHeight * 0.08,
               alignment: Alignment.centerRight,
-              child: Text(
-                '123234325',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: resultFontSize,
-                ),
-              ),
+              child: finalResult != null
+                  ? SelectableText(
+                      commafy(finalResult!),
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.5),
+                        fontWeight: FontWeight.bold,
+                        fontSize: resultFontSize,
+                      ),
+                    )
+                  : const SizedBox.shrink(),
             ),
             Container(
               alignment: Alignment.center,
@@ -206,7 +191,11 @@ class _HomePageState extends State<HomePage> {
 
                               return MyTap(
                                 onTap: () {
-                                  if (buttonType == 'oper' || buttonType == 'numb' || buttonType == 'deci') {
+                                  if (buttonType == 'oper' ||
+                                      buttonType == 'numb' ||
+                                      buttonType == 'deci' ||
+                                      buttonType == 'brack' ||
+                                      buttonType == "perc") {
                                     TextSelection currentSelection = controller.selection;
                                     int position = currentSelection.baseOffset;
 
@@ -215,27 +204,59 @@ class _HomePageState extends State<HomePage> {
                                     String prefix = text.substring(0, position);
                                     String suffix = text.substring(position, text.length);
 
+                                    //removing previous operator if followed by another operator
                                     if (buttonType == 'oper') {
                                       prefix = removeEndingOperator(prefix, operators);
                                       suffix = removeStartingOperator(suffix, operators);
                                     }
 
-                                    text = prefix + buttonOpr + suffix;
+                                    //adding 8 before right bracket if followed by a number
+                                    if (buttonOpr == '(') {
+                                      prefix = bracketFixer(prefix, operators);
+                                    }
 
+                                    text = prefix + buttonOpr + suffix;
                                     int intialLength = text.length;
 
                                     List listed = listify(text, operators + secondaryOperators); //seperating calcs into list
                                     text = listed.map((i) => checkDecimal(i)).join(); //removing secondary decimal dots
-
                                     text = text.replaceAll('\n', '');
+                                    text = text.replaceAll(',', ''); //removing all commas
+
+                                    //CALCULATION LOGIC
+                                    double? result = calculate(text);
+                                    //if calculation returns null(error catcher) string is empty
+                                    if (result != null) {
+                                      finalResult = customFormatNumber(result);
+                                    } else {
+                                      finalResult = null;
+                                    }
+                                    setState(() {});
+
                                     listed = listify(text, operators + secondaryOperators); //seperating calcs into list
 
-                                    double maxWidth = (screenWidth - (horPadding * 2)) * 0.8;
+                                    List newlisted = [];
+                                    String newpair = "";
+                                    for (String i in listed) {
+                                      if (!isValidString(i, context)) {
+                                        i = i.substring(0, i.length - 1); //removing the last i if length more than 15 or decimal point more than 10
+                                      }
+
+                                      if (operators.contains(i) || secondaryOperators.contains(i)) {
+                                        newlisted.add(newpair);
+                                        newpair = i;
+                                      } else {
+                                        newpair = newpair + commafy(i);
+                                      }
+                                    }
+                                    newlisted.add(newpair);
+
+                                    double maxWidth = (screenWidth - (horPadding * 2)) * 0.9;
                                     String newText = "";
                                     String line = "";
-                                    for (String i in listed) {
-                                      double iWidth = measureTextWidth(i, style);
-                                      double lineWidth = measureTextWidth(line, style);
+                                    for (String i in newlisted) {
+                                      double iWidth = measureTextWidth(i, calculationStyle);
+                                      double lineWidth = measureTextWidth(line, calculationStyle);
 
                                       if (lineWidth + iWidth <= maxWidth) {
                                         line = line + i;
@@ -246,7 +267,6 @@ class _HomePageState extends State<HomePage> {
                                     }
 
                                     text = newText + line;
-
                                     int processedLength = text.length;
 
                                     controller.text = text;
@@ -257,9 +277,6 @@ class _HomePageState extends State<HomePage> {
                                   if (buttonType == 'clr') {
                                     clearAll();
                                   }
-
-                                  //
-                                  //
                                 },
                                 child: Container(
                                   height: availableHeight / 5,
@@ -293,5 +310,8 @@ class _HomePageState extends State<HomePage> {
   void clearAll() {
     controller.text = "";
     controller.selection = const TextSelection.collapsed(offset: 0); // must set cursor ofset 0 after controller.text updates
+    setState(() {
+      finalResult = null;
+    });
   }
 }
