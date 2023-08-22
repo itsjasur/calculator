@@ -39,7 +39,7 @@ class _MyTapState extends State<MyTap> with SingleTickerProviderStateMixin {
         widget.onTap!();
       },
       onTapDown: (details) {
-        // Vibration.vibrate(duration: 50, amplitude: 355);
+        Vibration.vibrate(duration: 50, amplitude: 355);
         _controller.forward();
       },
       onTapUp: (details) => _controller.reverse(),

@@ -30,9 +30,15 @@ List listify(input, operators) {
 String removeEndingOperator(String input, List operators) {
   for (String operator in operators) {
     if (input.endsWith(operator)) {
-      print('AAA');
       return input.substring(0, input.length - operator.length);
     }
+  }
+  return input;
+}
+
+String removeDoublePercentage(String input) {
+  if (input.endsWith('%')) {
+    return input.substring(0, input.length - 1);
   }
   return input;
 }
@@ -40,18 +46,8 @@ String removeEndingOperator(String input, List operators) {
 String removeStartingOperator(String input, List operators) {
   for (String operator in operators) {
     if (input.startsWith(operator)) {
-      print('BBB');
       return input.substring(operator.length);
     }
-  }
-  return input;
-}
-
-String bracketFixer(String input, List operators) {
-  String last = input[input.length - 1];
-
-  if (!operators.contains(last)) {
-    input = '$input×';
   }
   return input;
 }
@@ -77,7 +73,9 @@ double measureTextWidth(String text, TextStyle style) {
   return textPainter.width;
 }
 
-double? calculate(String expression) {
+String? calculate(String expression) {
+  String? finalResult;
+
   expression = expression.replaceAll('×', '*');
   expression = expression.replaceAll('÷', '/');
   expression = expression.replaceAll('%', '/100');
@@ -89,11 +87,18 @@ double? calculate(String expression) {
 
     ContextModel cm = ContextModel();
     result = exp.evaluate(EvaluationType.REAL, cm);
+
+    // return result;
+    if (result != null) {
+      finalResult = customFormatNumber(result);
+    } else {
+      finalResult = null;
+    }
   } catch (e) {
     // print(e);
   }
 
-  return result;
+  return finalResult;
 }
 
 String formatNumber(double value) {
@@ -115,19 +120,74 @@ String customFormatNumber(double number) {
   }
 }
 
-String commafy(String amount) {
+String commafy(String amount, BuildContext context) {
   double value = 0;
   String stringAmount = "";
 
-  if (amount.endsWith('.')) {
-    value = double.parse(amount.substring(0, amount.length - 1));
-    stringAmount = intl.NumberFormat("#,###.##########").format(value).toString();
-    stringAmount = stringAmount + '.';
-  } else {
-    value = double.parse(amount);
-    stringAmount = intl.NumberFormat("#,###.##########").format(value).toString();
+  amount = amount.replaceAll(',', ''); //removing all commas
+
+  try {
+    if (amount.endsWith('.')) {
+      value = double.parse(amount.substring(0, amount.length - 1));
+      stringAmount = intl.NumberFormat("#,###.##########").format(value).toString();
+      stringAmount = stringAmount + '.';
+    } else {
+      value = double.parse(amount);
+      stringAmount = intl.NumberFormat("#,###.##########").format(value).toString();
+    }
+  } catch (e) {
+    const snackBar = SnackBar(content: Text("Invalid format"));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
   return stringAmount;
+}
+
+String commafyList({
+  required String calculations,
+  required BuildContext context,
+  required List operators,
+  required TextStyle calculationsStyle,
+  required screenWidth,
+  required horPadding,
+}) {
+  double value = 0;
+  String listedString = "";
+
+  List listedCalculations = listify(calculations, operators);
+  String stringAmount = "";
+  for (String i in listedCalculations) {
+    if (!operators.contains(i)) {
+      String amount = i.replaceAll(',', ''); //removing all commas
+
+      try {
+        if (amount.endsWith('.')) {
+          value = double.parse(amount.substring(0, amount.length - 1));
+          stringAmount = intl.NumberFormat("#,###.##########").format(value).toString();
+          stringAmount = stringAmount + '.';
+        } else {
+          value = double.parse(amount);
+          stringAmount = intl.NumberFormat("#,###.##########").format(value).toString();
+        }
+      } catch (e) {
+        const snackBar = SnackBar(content: Text("Invalid format"));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
+    } else {
+      stringAmount = i;
+    }
+    listedString = listedString + stringAmount;
+  }
+
+  List newListed = listify(listedString, operators);
+
+  listedString = breakIntoLines(
+    calculationStyle: calculationsStyle,
+    newlisted: newListed,
+    screenWidth: screenWidth,
+    horPadding: horPadding,
+  );
+
+  return listedString;
 }
 
 bool isValidString(String input, BuildContext context) {
@@ -152,4 +212,23 @@ bool isValidString(String input, BuildContext context) {
   }
 
   return true;
+}
+
+String breakIntoLines({required List newlisted, required double screenWidth, required horPadding, required TextStyle calculationStyle}) {
+  double maxWidth = (screenWidth - (horPadding * 2)) * 0.9;
+  String newText = "";
+  String line = "";
+  for (String i in newlisted) {
+    double iWidth = measureTextWidth(i, calculationStyle);
+    double lineWidth = measureTextWidth(line, calculationStyle);
+
+    if (lineWidth + iWidth <= maxWidth) {
+      line = line + i;
+    } else {
+      newText = newText + line + '\n';
+      line = i;
+    }
+  }
+
+  return newText + line;
 }
