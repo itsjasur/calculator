@@ -26,7 +26,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    fetchHistory();
   }
 
   @override
@@ -35,7 +34,7 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  fetchHistory() async {
+  Future fetchHistory() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? dataString = prefs.getString('historyList');
     if (dataString != null) {
@@ -53,27 +52,24 @@ class _HomePageState extends State<HomePage> {
     prefs.setString('historyList', dataString);
   }
 
+  Future clearHistory() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('historyList');
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
     final topSectionSize = screenHeight * 0.20;
     final bottomSection = screenHeight * 0.50;
-
     final horPadding = screenWidth * 0.05;
-
     final buttonMargin = screenWidth * 0.03;
     final bottomPadding = bottomSection * 0.03;
-
     final fontSize = screenHeight * 0.034;
-
     final topSectionFontSize = screenHeight * 0.028;
-
     final resultFontSize = screenHeight * 0.025;
-
     Color numberColor = Colors.white70;
-
     final availableHeight = bottomSection - (4 * buttonMargin) - bottomPadding;
     final availableWidth = screenWidth - (2 * horPadding) - (3 * buttonMargin);
 
@@ -169,116 +165,158 @@ class _HomePageState extends State<HomePage> {
                     )
                   : const SizedBox.shrink(),
             ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: horPadding),
-              height: screenHeight * 0.04,
-              alignment: Alignment.center,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  MyTap(
-                    onTap: () {
-                      setState(() {
-                        showhistory = !showhistory;
-                      });
-                    },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                MyTap(
+                  borderRadius: 6,
+                  onTap: () async {
+                    await fetchHistory();
+                    setState(() {
+                      showhistory = !showhistory;
+                    });
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    width: screenWidth * 0.15,
+                    height: screenHeight * 0.045,
                     child: Image.asset(
-                      'lib/icons/clock.png',
+                      showhistory ? 'lib/icons/clock.png' : 'lib/icons/calculator.png',
                       color: Colors.white60,
-                      height: screenWidth * 0.053,
                     ),
                   ),
-                  MyTap(
-                    onTap: () {
-                      logic(
-                        buttonType: 'remove',
-                        horPadding: horPadding,
-                        input: '',
-                        screenWidth: screenWidth,
-                        style: calculationStyle,
-                      );
-                    },
+                ),
+                MyTap(
+                  borderRadius: 6,
+                  onTap: () {
+                    logic(
+                      buttonType: 'remove',
+                      horPadding: horPadding,
+                      input: '',
+                      screenWidth: screenWidth,
+                      style: calculationStyle,
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: screenHeight * 0.006),
+                    width: screenWidth * 0.15,
+                    height: screenHeight * 0.045,
                     child: Image.asset(
                       'lib/icons/clear.png',
                       color: Colors.green,
                       height: screenWidth * 0.075,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
             Divider(color: Colors.white.withOpacity(0.1), thickness: screenHeight * 0.001),
             SizedBox(height: screenHeight * 0.01),
             showhistory
                 ? SizedBox(
                     height: bottomSection,
-                    child: ListView.builder(
-                      reverse: true,
-                      itemCount: history.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        String calculation = history[index]['calculation'];
-                        String result = history[index]['result'];
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                            padding: EdgeInsets.zero,
+                            // shrinkWrap: true,
+                            reverse: true,
+                            itemCount: history.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              history = history.reversed.toList();
 
-                        TextStyle calculationsStyle = TextStyle(
-                          color: Colors.white.withOpacity(0.6),
-                          fontWeight: FontWeight.bold,
-                          fontSize: screenHeight * 0.020,
-                        );
+                              String calculation = history[index]['calculation'];
+                              String result = history[index]['result'];
 
-                        TextStyle resultStyle = TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          fontWeight: FontWeight.bold,
-                          fontSize: screenHeight * 0.025,
-                        );
+                              TextStyle calculationsStyle = TextStyle(
+                                color: Colors.white.withOpacity(0.6),
+                                fontWeight: FontWeight.bold,
+                                fontSize: screenHeight * 0.019,
+                              );
 
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            MyTap(
-                              onTap: () {
-                                logic(
-                                  buttonType: 'history',
-                                  input: calculation,
-                                  style: calculationsStyle,
-                                  screenWidth: screenWidth,
-                                  horPadding: horPadding,
-                                );
-                              },
-                              child: Text(
-                                maxLines: null,
-                                textAlign: TextAlign.end,
-                                commafyList(
-                                  calculations: calculation,
-                                  context: context,
-                                  operators: operators,
-                                  calculationsStyle: calculationsStyle,
-                                  horPadding: horPadding,
-                                  screenWidth: screenWidth,
-                                ),
-                                style: calculationsStyle,
+                              TextStyle resultStyle = TextStyle(
+                                color: Colors.white.withOpacity(0.8),
+                                fontWeight: FontWeight.bold,
+                                fontSize: screenHeight * 0.022,
+                              );
+
+                              return Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  MyTap(
+                                    onTap: () {
+                                      logic(
+                                        buttonType: 'history',
+                                        input: calculation,
+                                        style: calculationsStyle,
+                                        screenWidth: screenWidth,
+                                        horPadding: horPadding,
+                                      );
+                                    },
+                                    child: Text(
+                                      calculation,
+                                      maxLines: null,
+                                      textAlign: TextAlign.end,
+                                      style: calculationsStyle,
+                                    ),
+                                  ),
+                                  SizedBox(height: screenHeight * 0.004),
+                                  MyTap(
+                                    onTap: () {
+                                      logic(
+                                        buttonType: 'history',
+                                        input: result,
+                                        style: calculationsStyle,
+                                        screenWidth: screenWidth,
+                                        horPadding: horPadding,
+                                      );
+                                    },
+                                    child: Text(
+                                      result,
+                                      textAlign: TextAlign.end,
+                                      style: resultStyle,
+                                    ),
+                                  ),
+                                  Divider(
+                                    color: Colors.white.withOpacity(0.03),
+                                    thickness: screenHeight * 0.001,
+                                    height: screenHeight * 0.03,
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                        MyTap(
+                          borderRadius: screenWidth * 0.05,
+                          onTap: () async {
+                            history.clear();
+                            await clearHistory();
+                            showhistory = !showhistory;
+                            setState(() {});
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                            child: Text(
+                              'Clear history',
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontSize: screenHeight * 0.02,
                               ),
                             ),
-                            SizedBox(height: screenHeight * 0.004),
-                            MyTap(
-                              onTap: () {
-                                logic(
-                                  buttonType: 'history',
-                                  input: result,
-                                  style: calculationsStyle,
-                                  screenWidth: screenWidth,
-                                  horPadding: horPadding,
-                                );
-                              },
-                              child: Text(
-                                '=${commafy(result, context)}',
-                                style: resultStyle,
-                              ),
-                            ),
-                            Divider(color: Colors.white.withOpacity(0.03), thickness: screenHeight * 0.001),
-                          ],
-                        );
-                      },
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.02)
+                      ],
                     ),
                   )
                 : SizedBox(
@@ -302,8 +340,9 @@ class _HomePageState extends State<HomePage> {
                                     String buttonOpr = eachButton['operation'];
 
                                     return MyTap(
+                                      borderRadius: availableWidth * 0.05,
                                       onTap: () {
-                                        logic(
+                                        return logic(
                                           buttonType: buttonType,
                                           horPadding: horPadding,
                                           input: buttonOpr,
@@ -348,12 +387,15 @@ class _HomePageState extends State<HomePage> {
       finalResult = null;
     } else if (buttonType == 'equal') {
       if (finalResult != null) {
-        saveInHistory(controller.text, finalResult!);
+        String calculation = controller.text;
+        finalResult = commafy(finalResult!, context);
+        controller.text = finalResult!;
+        saveInHistory(calculation, finalResult!);
 
-        controller.text = commafy(finalResult!, context);
         finalResult = null;
         controller.selection = TextSelection.collapsed(offset: controller.text.length);
       } else {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
         const snackBar = SnackBar(content: Text("Invalid format"));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
@@ -448,25 +490,4 @@ class _HomePageState extends State<HomePage> {
 
     setState(() {});
   }
-
-  // if (buttonType == 'clear') {
-  //   controller.text = "";
-  //   // must set cursor ofset 0 after controller.text updates
-  //   controller.selection = const TextSelection.collapsed(offset: 0);
-  //   finalResult = null;
-  //   setState(() {});
-  // }
-  // if (buttonType == 'equal') {
-  //   if (finalResult != null) {
-  //     saveInHistory(controller.text, finalResult!);
-
-  //     controller.text = commafy(finalResult!, context);
-  //     finalResult = null;
-  //     controller.selection = TextSelection.collapsed(offset: controller.text.length);
-  //   } else {
-  //     const snackBar = SnackBar(content: Text("Invalid format"));
-  //     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  //   }
-  // }
-  // }
 }

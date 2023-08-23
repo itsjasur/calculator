@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
@@ -25,6 +26,20 @@ class MyApp extends StatelessWidget {
           backgroundColor: myCustomColor,
         ),
         scaffoldBackgroundColor: myCustomColor,
+
+        snackBarTheme: SnackBarThemeData(
+          width: screenWidth * 0.7,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(100),
+          ),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.white24,
+          contentTextStyle: TextStyle(
+            fontSize: screenWidth * 0.04,
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
         // textTheme: const TextTheme(
         //   bodyMedium: TextStyle(
         //     fontWeight: FontWeight.bold,

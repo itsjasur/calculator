@@ -4,8 +4,9 @@ import 'package:vibration/vibration.dart';
 class MyTap extends StatefulWidget {
   final Widget child;
   final Function? onTap;
+  final double borderRadius;
 
-  const MyTap({super.key, required this.child, this.onTap});
+  const MyTap({super.key, required this.child, this.onTap, this.borderRadius = 0});
 
   @override
   State<MyTap> createState() => _MyTapState();
@@ -34,18 +35,23 @@ class _MyTapState extends State<MyTap> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        widget.onTap!();
-      },
-      onTapDown: (details) {
-        Vibration.vibrate(duration: 50, amplitude: 355);
-        _controller.forward();
-      },
-      onTapUp: (details) => _controller.reverse(),
-      onTapCancel: () => _controller.reverse(),
-      child: Transform.scale(
-        scale: _scaleAnimation.value,
+    return Transform.scale(
+      scale: _scaleAnimation.value,
+      child: InkWell(
+        splashColor: Colors.transparent,
+        highlightColor: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(
+          widget.borderRadius,
+        ),
+        onTap: () {
+          if (widget.onTap != null) widget.onTap!();
+        },
+        onTapDown: (details) {
+          Vibration.vibrate(duration: 50, amplitude: 355);
+          _controller.forward();
+        },
+        onTapUp: (details) => _controller.reverse(),
+        onTapCancel: () => _controller.reverse(),
         child: widget.child,
       ),
     );

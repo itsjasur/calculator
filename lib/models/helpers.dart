@@ -169,13 +169,13 @@ String commafyList({
           stringAmount = intl.NumberFormat("#,###.##########").format(value).toString();
         }
       } catch (e) {
-        const snackBar = SnackBar(content: Text("Invalid format"));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        // ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        // const snackBar = SnackBar(content: Text("Invalid format"));
+        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     } else {
       stringAmount = i;
     }
-    listedString = listedString + stringAmount;
   }
 
   List newListed = listify(listedString, operators);
@@ -187,12 +187,14 @@ String commafyList({
     horPadding: horPadding,
   );
 
+  listedString = listedString + stringAmount;
   return listedString;
 }
 
 bool isValidString(String input, BuildContext context) {
   // Check the total length
   if (input.length > 15) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     const snackBar = SnackBar(content: Text("Can't enter more than 15 digits"));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
     return false;
