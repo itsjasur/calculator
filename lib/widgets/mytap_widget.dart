@@ -19,7 +19,8 @@ class _MyTapState extends State<MyTap> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 100))
+
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 50))
       ..addListener(() {
         setState(() {});
       });
@@ -38,16 +39,14 @@ class _MyTapState extends State<MyTap> with SingleTickerProviderStateMixin {
     return Transform.scale(
       scale: _scaleAnimation.value,
       child: InkWell(
-        splashColor: Colors.transparent,
-        highlightColor: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(
-          widget.borderRadius,
-        ),
+        splashFactory: NoSplash.splashFactory,
+        highlightColor: Colors.white10,
+        borderRadius: BorderRadius.circular(widget.borderRadius),
         onTap: () {
+          Vibration.vibrate(duration: 10, amplitude: 200);
           if (widget.onTap != null) widget.onTap!();
         },
         onTapDown: (details) {
-          Vibration.vibrate(duration: 50, amplitude: 355);
           _controller.forward();
         },
         onTapUp: (details) => _controller.reverse(),

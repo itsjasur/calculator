@@ -1,8 +1,8 @@
 import 'dart:convert';
-
 import 'package:calculator/widgets/mytap_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vibration/vibration.dart';
 import 'models/helpers.dart';
 
 class HomePage extends StatefulWidget {
@@ -67,8 +67,8 @@ class _HomePageState extends State<HomePage> {
     final buttonMargin = screenWidth * 0.03;
     final bottomPadding = bottomSection * 0.03;
     final fontSize = screenHeight * 0.034;
-    final topSectionFontSize = screenHeight * 0.028;
-    final resultFontSize = screenHeight * 0.025;
+    final topSectionFontSize = screenHeight * 0.03;
+    final resultFontSize = screenHeight * 0.028;
     Color numberColor = Colors.white70;
     final availableHeight = bottomSection - (4 * buttonMargin) - bottomPadding;
     final availableWidth = screenWidth - (2 * horPadding) - (3 * buttonMargin);
@@ -118,7 +118,7 @@ class _HomePageState extends State<HomePage> {
     );
 
     return Scaffold(
-      // appBar: AppBar(backgroundColor: Colors.red),
+      // appBar: AppBar(),
       body: Container(
         height: double.infinity,
         padding: EdgeInsets.symmetric(horizontal: horPadding),
@@ -207,10 +207,7 @@ class _HomePageState extends State<HomePage> {
                     padding: EdgeInsets.symmetric(vertical: screenHeight * 0.007),
                     width: screenWidth * 0.15,
                     height: screenHeight * 0.045,
-                    child: Image.asset(
-                      'lib/icons/erase.png',
-                      color: Colors.green,
-                    ),
+                    child: Image.asset('lib/icons/erase.png', color: Colors.green),
                   ),
                 ),
               ],
@@ -238,13 +235,13 @@ class _HomePageState extends State<HomePage> {
                               TextStyle calculationsStyle = TextStyle(
                                 color: Colors.white.withOpacity(0.6),
                                 fontWeight: FontWeight.bold,
-                                fontSize: screenHeight * 0.019,
+                                fontSize: screenHeight * 0.02,
                               );
 
                               TextStyle resultStyle = TextStyle(
                                 color: Colors.white.withOpacity(0.8),
                                 fontWeight: FontWeight.bold,
-                                fontSize: screenHeight * 0.022,
+                                fontSize: screenHeight * 0.024,
                               );
 
                               return Column(
@@ -339,7 +336,7 @@ class _HomePageState extends State<HomePage> {
                                     String buttonOpr = eachButton['operation'];
 
                                     return MyTap(
-                                      borderRadius: availableWidth * 0.05,
+                                      borderRadius: availableWidth * 0.03,
                                       onTap: () {
                                         return logic(
                                           buttonType: buttonType,
@@ -353,10 +350,8 @@ class _HomePageState extends State<HomePage> {
                                         height: availableHeight / 5,
                                         width: availableWidth / 4,
                                         decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.01),
-                                          borderRadius: BorderRadius.circular(
-                                            availableWidth * 0.05,
-                                          ),
+                                          color: Colors.white.withOpacity(0.05),
+                                          borderRadius: BorderRadius.circular(availableWidth * 0.03),
                                         ),
                                         alignment: Alignment.center,
                                         child: eachButton['content'],
@@ -386,7 +381,7 @@ class _HomePageState extends State<HomePage> {
       finalResult = null;
     } else if (buttonType == 'equal') {
       List calculations = listify(controller.text, operators);
-      if (calculations.length == 1) {
+      if (calculations.length <= 1) {
       } else if (finalResult != null) {
         String calculation = controller.text;
         finalResult = commafy(finalResult!, context);
@@ -462,9 +457,11 @@ class _HomePageState extends State<HomePage> {
       List newlisted = [];
       String newpair = "";
       for (String i in listed) {
-        if (!isValidString(i, context)) {
-          //removing the last i if length more than 15 or after decimal point more than 10
-          i = i.substring(0, i.length - 1);
+        if (buttonType != 'remove') {
+          if (!isValidString(i, context)) {
+            //removing the last i if length more than 15 or after decimal point more than 10
+            i = i.substring(0, i.length - 1);
+          }
         }
 
         if (operators.contains(i) || secondaryOperators.contains(i)) {
