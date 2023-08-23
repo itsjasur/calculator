@@ -177,14 +177,14 @@ class _HomePageState extends State<HomePage> {
                     });
                   },
                   child: Container(
-                    padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
+                    padding: EdgeInsets.symmetric(vertical: screenHeight * 0.007),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(6),
                     ),
                     width: screenWidth * 0.15,
                     height: screenHeight * 0.045,
                     child: Image.asset(
-                      showhistory ? 'lib/icons/clock.png' : 'lib/icons/calculator.png',
+                      showhistory ? 'lib/icons/history.png' : 'lib/icons/calculator.png',
                       color: Colors.white60,
                     ),
                   ),
@@ -204,13 +204,12 @@ class _HomePageState extends State<HomePage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    padding: EdgeInsets.symmetric(vertical: screenHeight * 0.006),
+                    padding: EdgeInsets.symmetric(vertical: screenHeight * 0.007),
                     width: screenWidth * 0.15,
                     height: screenHeight * 0.045,
                     child: Image.asset(
-                      'lib/icons/clear.png',
+                      'lib/icons/erase.png',
                       color: Colors.green,
-                      height: screenWidth * 0.075,
                     ),
                   ),
                 ),
@@ -386,7 +385,9 @@ class _HomePageState extends State<HomePage> {
       controller.selection = const TextSelection.collapsed(offset: 0);
       finalResult = null;
     } else if (buttonType == 'equal') {
-      if (finalResult != null) {
+      List calculations = listify(controller.text, operators);
+      if (calculations.length == 1) {
+      } else if (finalResult != null) {
         String calculation = controller.text;
         finalResult = commafy(finalResult!, context);
         controller.text = finalResult!;
@@ -396,7 +397,7 @@ class _HomePageState extends State<HomePage> {
         controller.selection = TextSelection.collapsed(offset: controller.text.length);
       } else {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        const snackBar = SnackBar(content: Text("Invalid format"));
+        const snackBar = SnackBar(content: Center(child: Text("Invalid format")));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     } else {

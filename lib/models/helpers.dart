@@ -136,7 +136,7 @@ String commafy(String amount, BuildContext context) {
       stringAmount = intl.NumberFormat("#,###.##########").format(value).toString();
     }
   } catch (e) {
-    const snackBar = SnackBar(content: Text("Invalid format"));
+    const snackBar = SnackBar(content: Center(child: Text("Invalid format")));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
   return stringAmount;
@@ -195,7 +195,7 @@ bool isValidString(String input, BuildContext context) {
   // Check the total length
   if (input.length > 15) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    const snackBar = SnackBar(content: Text("Can't enter more than 15 digits"));
+    const snackBar = SnackBar(content: Center(child: Text("Can't enter more than 15 digits")));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
     return false;
   }
@@ -207,7 +207,7 @@ bool isValidString(String input, BuildContext context) {
     // Check if characters after '.' are more than 10
     if (input.length - dotPosition - 1 > 10) {
       ScaffoldMessenger.of(context).removeCurrentSnackBar();
-      const snackBar = SnackBar(content: Text("Can't enter more than 10 digits after decimal point"));
+      const snackBar = SnackBar(content: Center(child: Text("Can't enter more than 10 digits after decimal point")));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       return false;
     }
