@@ -76,13 +76,13 @@ class _HomePageState extends State<HomePage> {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
 
-    final bottomSection = screenHeight * 0.50;
+    final bottomSection = screenHeight * 0.5;
     final horPadding = screenWidth * 0.05;
     final buttonMargin = screenWidth * 0.03;
     final bottomPadding = bottomSection * 0.03;
-    final buttonFontSize = screenWidth * 0.07;
-    final inputFontSize = screenWidth * 0.065;
-    final resultFontSize = screenWidth * 0.06;
+    final btnFontSize = screenWidth * 0.073;
+    final inputFontSize = screenWidth * 0.073;
+    final resultFontSize = screenWidth * 0.063;
 
     Color numberColor = Colors.white70;
     final availableHeight = bottomSection - (4 * buttonMargin) - bottomPadding;
@@ -90,34 +90,34 @@ class _HomePageState extends State<HomePage> {
 
     List<List<Map>> buttons = [
       [
-        {'type': 'brack', 'content': Text('(', style: TextStyle(fontSize: buttonFontSize, color: Colors.green)), 'operation': '('},
-        {'type': 'brack', 'content': Text(')', style: TextStyle(fontSize: buttonFontSize, color: Colors.green)), 'operation': ')'},
-        {'type': 'perc', 'content': Text('%', style: TextStyle(fontSize: buttonFontSize, color: Colors.green)), 'operation': '%'},
-        {'type': 'oper', 'content': Text('÷', style: TextStyle(fontSize: buttonFontSize, color: Colors.green)), 'operation': '÷'},
+        {'type': 'brack', 'content': Text('(', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: Colors.green)), 'operation': '('},
+        {'type': 'brack', 'content': Text(')', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: Colors.green)), 'operation': ')'},
+        {'type': 'perc', 'content': Text('%', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: Colors.green)), 'operation': '%'},
+        {'type': 'oper', 'content': Text('÷', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: Colors.green)), 'operation': '÷'},
       ],
       [
-        {'type': 'numb', 'content': Text('7', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '7'},
-        {'type': 'numb', 'content': Text('8', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '8'},
-        {'type': 'numb', 'content': Text('9', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '9'},
-        {'type': 'oper', 'content': Text('×', style: TextStyle(fontSize: buttonFontSize, color: Colors.green)), 'operation': '×'},
+        {'type': 'numb', 'content': Text('7', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: numberColor)), 'operation': '7'},
+        {'type': 'numb', 'content': Text('8', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: numberColor)), 'operation': '8'},
+        {'type': 'numb', 'content': Text('9', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: numberColor)), 'operation': '9'},
+        {'type': 'oper', 'content': Text('×', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: Colors.green)), 'operation': '×'},
       ],
       [
-        {'type': 'numb', 'content': Text('4', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '4'},
-        {'type': 'numb', 'content': Text('5', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '5'},
-        {'type': 'numb', 'content': Text('6', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '6'},
-        {'type': 'oper', 'content': Text('-', style: TextStyle(fontSize: buttonFontSize, color: Colors.green)), 'operation': '-'},
+        {'type': 'numb', 'content': Text('4', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: numberColor)), 'operation': '4'},
+        {'type': 'numb', 'content': Text('5', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: numberColor)), 'operation': '5'},
+        {'type': 'numb', 'content': Text('6', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: numberColor)), 'operation': '6'},
+        {'type': 'oper', 'content': Text('-', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: Colors.green)), 'operation': '-'},
       ],
       [
-        {'type': 'numb', 'content': Text('1', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '1'},
-        {'type': 'numb', 'content': Text('2', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '2'},
-        {'type': 'numb', 'content': Text('3', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '3'},
-        {'type': 'oper', 'content': Text('+', style: TextStyle(fontSize: buttonFontSize, color: Colors.green)), 'operation': '+'},
+        {'type': 'numb', 'content': Text('1', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: numberColor)), 'operation': '1'},
+        {'type': 'numb', 'content': Text('2', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: numberColor)), 'operation': '2'},
+        {'type': 'numb', 'content': Text('3', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: numberColor)), 'operation': '3'},
+        {'type': 'oper', 'content': Text('+', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: Colors.green)), 'operation': '+'},
       ],
       [
-        {'type': 'clear', 'content': Text('C', style: TextStyle(fontSize: buttonFontSize, color: Colors.red)), 'operation': 'clearAll'},
-        {'type': 'numb', 'content': Text('0', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '0'},
-        {'type': 'deci', 'content': Text('.', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '.'},
-        {'type': 'equal', 'content': Text('=', style: TextStyle(fontSize: buttonFontSize, color: Colors.green)), 'operation': '='},
+        {'type': 'clear', 'content': Text('C', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: Colors.red)), 'operation': 'clearAll'},
+        {'type': 'numb', 'content': Text('0', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: numberColor)), 'operation': '0'},
+        {'type': 'deci', 'content': Text('.', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: numberColor)), 'operation': '.'},
+        {'type': 'equal', 'content': Text('=', style: TextStyle(fontWeight: FontWeight.w500, fontSize: btnFontSize, color: Colors.green)), 'operation': '='},
       ],
     ];
 
@@ -143,51 +143,54 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(
                   height: screenHeight * 0.2,
                   width: double.infinity,
-                  child: Stack(
-                    alignment: Alignment.bottomRight,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.only(right: 3),
-                        width: double.infinity,
-                        child: RichText(
-                          textAlign: TextAlign.right,
-                          maxLines: null,
-                          text: TextSpan(
-                            style: TextStyle(
-                              fontSize: inputFontSize,
-                              color: Colors.white.withOpacity(0.8),
-                              letterSpacing: 1.5,
-                              height: 1.35,
-                              fontWeight: FontWeight.w500,
-                              wordSpacing: 1,
+                  child: SingleChildScrollView(
+                    reverse: true,
+                    child: Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.only(right: 3),
+                          width: double.infinity,
+                          child: RichText(
+                            textAlign: TextAlign.right,
+                            maxLines: null,
+                            text: TextSpan(
+                              style: TextStyle(
+                                fontSize: inputFontSize,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white.withOpacity(0.8),
+                                letterSpacing: 1.5,
+                                height: 1.35,
+                                wordSpacing: 1,
+                              ),
+                              children: List.from(inputSpans),
                             ),
-                            children: List.from(inputSpans),
                           ),
                         ),
-                      ),
-                      TextField(
-                        textAlign: TextAlign.right,
-                        controller: controller,
-                        showCursor: true,
-                        autofocus: true,
-                        keyboardType: TextInputType.none,
-                        maxLines: null,
-                        style: calculationStyle,
-                        decoration: const InputDecoration(
-                          isDense: true,
-                          contentPadding: EdgeInsets.zero,
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
+                        TextField(
+                          textAlign: TextAlign.right,
+                          controller: controller,
+                          showCursor: true,
+                          autofocus: true,
+                          keyboardType: TextInputType.none,
+                          maxLines: null,
+                          style: calculationStyle,
+                          decoration: const InputDecoration(
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-                SizedBox(height: screenHeight * 0.005),
+                SizedBox(height: screenHeight * 0.015),
                 Container(
-                  height: screenHeight * 0.05,
+                  height: screenHeight * 0.06,
                   alignment: Alignment.centerRight,
                   child: finalResult != null
                       ? SelectableText(
@@ -221,7 +224,7 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     width: screenWidth * 0.15,
-                    height: screenHeight * 0.045,
+                    height: screenHeight * 0.04,
                     child: Image.asset(
                       showhistory ? 'lib/icons/history.png' : 'lib/icons/calculator.png',
                       color: Colors.white60,
@@ -245,14 +248,15 @@ class _HomePageState extends State<HomePage> {
                     ),
                     padding: EdgeInsets.symmetric(vertical: screenHeight * 0.007),
                     width: screenWidth * 0.15,
-                    height: screenHeight * 0.045,
+                    height: screenHeight * 0.04,
                     child: Image.asset('lib/icons/erase.png', color: Colors.green),
                   ),
                 ),
               ],
             ),
 
-            Divider(thickness: screenHeight * 0.0005, color: Colors.white54),
+            SizedBox(height: screenHeight * 0.005),
+            Divider(thickness: screenHeight * 0.002, color: Colors.white10),
             SizedBox(height: screenHeight * 0.02),
 
             showhistory
@@ -276,13 +280,13 @@ class _HomePageState extends State<HomePage> {
                               TextStyle historyCalculationsStyle = TextStyle(
                                 color: Colors.white.withOpacity(0.6),
                                 fontWeight: FontWeight.w500,
-                                fontSize: screenWidth * 0.045,
+                                fontSize: screenWidth * 0.055,
                               );
 
                               TextStyle historyResultStyle = TextStyle(
                                 color: Colors.green,
                                 fontWeight: FontWeight.w500,
-                                fontSize: screenWidth * 0.05,
+                                fontSize: screenWidth * 0.06,
                               );
 
                               return Column(
@@ -318,7 +322,7 @@ class _HomePageState extends State<HomePage> {
                                       );
                                     },
                                     child: Text(
-                                      '=$result',
+                                      '= $result',
                                       textAlign: TextAlign.end,
                                       style: historyResultStyle,
                                     ),
@@ -387,7 +391,11 @@ class _HomePageState extends State<HomePage> {
 
                                           setState(() {});
                                         } else if (buttonType == 'equal') {
-                                          if (finalResult != null) {
+                                          if (finalResult == null && controller.text.isNotEmpty) {
+                                            ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                            const snackBar = SnackBar(content: Center(child: Text("Invalid format")));
+                                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                          } else if (finalResult != null) {
                                             await saveInHistory(controller.text, finalResult!);
                                             controller.text = finalResult!;
                                             controller.selection = TextSelection.collapsed(offset: controller.text.length);
@@ -496,14 +504,14 @@ class _HomePageState extends State<HomePage> {
       if (result != null) {
         finalResult = NumberFormat('#,###.#########').format(result);
 
-        if (finalResult!.length >= 15) {
+        if (finalResult!.length >= 24) {
           finalResult = result.toStringAsExponential(10);
         }
         setState(() {});
+      } else {
+        finalResult = null;
+        setState(() {});
       }
-    } else {
-      finalResult = null;
-      setState(() {});
     }
 
     // formatting inputText as #,###
@@ -513,7 +521,6 @@ class _HomePageState extends State<HomePage> {
         commafiedListedInput.add(i);
       } else {
         i = decimalChecker(i); // keeping only one decimal point
-
         if (i.endsWith('.')) {
           double? number = double.tryParse(i);
           if (number != null) {
@@ -536,10 +543,7 @@ class _HomePageState extends State<HomePage> {
     String newpair = "";
     for (String i in commafiedListedInput) {
       if (buttonType != 'remove') {
-        if (!isValidString(i, context)) {
-          //removing the last i if length more than 15 or after decimal point more than 10
-          i = i.substring(0, i.length - 1);
-        }
+        i = validateInput(i, operators, context);
       }
 
       if (mathOperators.contains(i)) {
@@ -561,16 +565,6 @@ class _HomePageState extends State<HomePage> {
 
     //updating number of lines
     numberOfLines = '\n'.allMatches(inputText).length;
-
-    // inputSpans.clear();
-    // for (int i = 0; i < inputText.length; i++) {
-    //   if (operators.contains(inputText[i])) {
-    //     inputSpans.add(TextSpan(text: inputText[i], style: const TextStyle(color: Colors.green)));
-    //   } else {
-    //     inputSpans.add(TextSpan(text: inputText[i]));
-    //   }
-    // }
-    // setState(() {});
 
     int currentInputLength = inputText.length; //after format inputtext length
 

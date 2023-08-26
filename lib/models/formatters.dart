@@ -41,29 +41,32 @@ String breakIntoLines({required List newlisted, required double screenWidth, req
   return newText + line;
 }
 
-bool isValidString(String input, BuildContext context) {
-  // Check the total length
-  if (input.length > 15) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    const snackBar = SnackBar(content: Center(child: Text("Can't enter more than 15 digits")));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    return false;
-  }
+String validateInput(String input, List operators, BuildContext context) {
+  if (operators.contains(input)) {
+    return input;
+  } else {
+    List<String> parts = input.split('.');
+    String leftSide = parts[0];
+    String rightSide = parts.length > 1 ? parts[1] : ""; // Handling the case if there's no decimal point
 
-  // If there's a '.' in the string, validate its position
-  if (input.contains('.')) {
-    int dotPosition = input.indexOf('.');
+    if (leftSide.length > 15) {
+      leftSide = leftSide.substring(0, leftSide.length - 1);
 
-    // Check if characters after '.' are more than 10
-    if (input.length - dotPosition - 1 > 10) {
-      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-      const snackBar = SnackBar(content: Center(child: Text("Can't enter more than 10 digits after decimal point")));
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      const snackBar = SnackBar(content: Center(child: Text("Can't enter more than 15 digits")));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      return false;
     }
-  }
+    if (rightSide.length >= 9) {
+      rightSide = rightSide.substring(0, rightSide.length - 1);
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      const snackBar = SnackBar(content: Center(child: Text("Can't enter more than 9 digits after decimal point")));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
 
-  return true;
+    input = leftSide + (parts.length > 1 ? '.$rightSide' : '');
+
+    return input;
+  }
 }
 
 double? calculate(String expression) {
@@ -79,9 +82,7 @@ double? calculate(String expression) {
 
     ContextModel cm = ContextModel();
     result = exp.evaluate(EvaluationType.REAL, cm);
-  } catch (e) {
-    // print(e);
-  }
+  } catch (e) {}
 
   return result;
 }

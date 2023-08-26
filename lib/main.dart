@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'home.dart';
 
 Color myCustomColor = const Color(0xFF000000);

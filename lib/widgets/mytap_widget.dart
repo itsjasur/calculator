@@ -20,7 +20,7 @@ class _MyTapState extends State<MyTap> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 50))
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 75))
       ..addListener(() {
         setState(() {});
       });
