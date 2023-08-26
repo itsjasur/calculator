@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'home.dart';
 
@@ -6,6 +7,11 @@ Color myCustomColor = const Color(0xFF000000);
 
 void main() {
   runApp(const MyApp());
+
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 }
 
 class MyApp extends StatelessWidget {
@@ -22,9 +28,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: myCustomColor,
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.green),
         useMaterial3: true,
-        appBarTheme: AppBarTheme(
-          backgroundColor: myCustomColor,
-        ),
+        appBarTheme: AppBarTheme(backgroundColor: myCustomColor),
         snackBarTheme: SnackBarThemeData(
           width: screenWidth * 0.7,
           shape: RoundedRectangleBorder(

@@ -1,9 +1,11 @@
 import 'dart:convert';
+
 import 'package:calculator/widgets/mytap_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vibration/vibration.dart';
-import 'models/helpers.dart';
+
+import 'models/formatters.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,23 +17,35 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController controller = TextEditingController();
 
-  List operators = ['+', '-', '÷', '×', '*', '/'];
-  List secondaryOperators = ['(', ')', '%'];
+  late double screenHeight;
+  late double screenWidth;
+
+  String? finalResult;
+
+  int numberOfLines = 1;
 
   List history = [];
   bool showhistory = false;
 
-  String? finalResult;
+  List<TextSpan> inputSpans = [];
+
+  List operators = ['+', '-', '÷', '×', '*', '/', '%', '(', ')'];
+  List mathOperators = ['+', '-', '÷', '×', '*', '/'];
 
   @override
   void initState() {
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
+    controller.addListener(() {
+      inputSpans.clear();
+      for (int i = 0; i < controller.text.length; i++) {
+        if (operators.contains(controller.text[i])) {
+          inputSpans.add(TextSpan(text: controller.text[i], style: const TextStyle(color: Colors.green)));
+        } else {
+          inputSpans.add(TextSpan(text: controller.text[i]));
+        }
+      }
+      setState(() {});
+    });
   }
 
   Future fetchHistory() async {
@@ -59,112 +73,137 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final topSectionSize = screenHeight * 0.20;
+    screenWidth = MediaQuery.of(context).size.width;
+    screenHeight = MediaQuery.of(context).size.height;
+
     final bottomSection = screenHeight * 0.50;
     final horPadding = screenWidth * 0.05;
     final buttonMargin = screenWidth * 0.03;
     final bottomPadding = bottomSection * 0.03;
-    final fontSize = screenHeight * 0.034;
-    final topSectionFontSize = screenHeight * 0.03;
-    final resultFontSize = screenHeight * 0.028;
+    final buttonFontSize = screenWidth * 0.07;
+    final inputFontSize = screenWidth * 0.065;
+    final resultFontSize = screenWidth * 0.06;
+
     Color numberColor = Colors.white70;
     final availableHeight = bottomSection - (4 * buttonMargin) - bottomPadding;
     final availableWidth = screenWidth - (2 * horPadding) - (3 * buttonMargin);
 
     List<List<Map>> buttons = [
       [
-        {'type': 'brack', 'content': Text('(', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': '('},
-        {'type': 'brack', 'content': Text(')', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': ')'},
-        {'type': 'perc', 'content': Text('%', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': '%'},
-        {'type': 'oper', 'content': Text('÷', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': '÷'},
+        {'type': 'brack', 'content': Text('(', style: TextStyle(fontSize: buttonFontSize, color: Colors.green)), 'operation': '('},
+        {'type': 'brack', 'content': Text(')', style: TextStyle(fontSize: buttonFontSize, color: Colors.green)), 'operation': ')'},
+        {'type': 'perc', 'content': Text('%', style: TextStyle(fontSize: buttonFontSize, color: Colors.green)), 'operation': '%'},
+        {'type': 'oper', 'content': Text('÷', style: TextStyle(fontSize: buttonFontSize, color: Colors.green)), 'operation': '÷'},
       ],
       [
-        {'type': 'numb', 'content': Text('7', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '7'},
-        {'type': 'numb', 'content': Text('8', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '8'},
-        {'type': 'numb', 'content': Text('9', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '9'},
-        {'type': 'oper', 'content': Text('×', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': '×'},
+        {'type': 'numb', 'content': Text('7', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '7'},
+        {'type': 'numb', 'content': Text('8', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '8'},
+        {'type': 'numb', 'content': Text('9', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '9'},
+        {'type': 'oper', 'content': Text('×', style: TextStyle(fontSize: buttonFontSize, color: Colors.green)), 'operation': '×'},
       ],
       [
-        {'type': 'numb', 'content': Text('4', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '4'},
-        {'type': 'numb', 'content': Text('5', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '5'},
-        {'type': 'numb', 'content': Text('6', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '6'},
-        {'type': 'oper', 'content': Text('-', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': '-'},
+        {'type': 'numb', 'content': Text('4', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '4'},
+        {'type': 'numb', 'content': Text('5', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '5'},
+        {'type': 'numb', 'content': Text('6', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '6'},
+        {'type': 'oper', 'content': Text('-', style: TextStyle(fontSize: buttonFontSize, color: Colors.green)), 'operation': '-'},
       ],
       [
-        {'type': 'numb', 'content': Text('1', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '1'},
-        {'type': 'numb', 'content': Text('2', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '2'},
-        {'type': 'numb', 'content': Text('3', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '3'},
-        {'type': 'oper', 'content': Text('+', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': '+'},
+        {'type': 'numb', 'content': Text('1', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '1'},
+        {'type': 'numb', 'content': Text('2', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '2'},
+        {'type': 'numb', 'content': Text('3', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '3'},
+        {'type': 'oper', 'content': Text('+', style: TextStyle(fontSize: buttonFontSize, color: Colors.green)), 'operation': '+'},
       ],
       [
-        {'type': 'clear', 'content': Text('C', style: TextStyle(fontSize: fontSize, color: Colors.red)), 'operation': 'clearAll'},
-        {'type': 'numb', 'content': Text('0', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '0'},
-        {'type': 'deci', 'content': Text('.', style: TextStyle(fontSize: fontSize, color: numberColor)), 'operation': '.'},
-        {'type': 'equal', 'content': Text('=', style: TextStyle(fontSize: fontSize, color: Colors.green)), 'operation': '='},
+        {'type': 'clear', 'content': Text('C', style: TextStyle(fontSize: buttonFontSize, color: Colors.red)), 'operation': 'clearAll'},
+        {'type': 'numb', 'content': Text('0', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '0'},
+        {'type': 'deci', 'content': Text('.', style: TextStyle(fontSize: buttonFontSize, color: numberColor)), 'operation': '.'},
+        {'type': 'equal', 'content': Text('=', style: TextStyle(fontSize: buttonFontSize, color: Colors.green)), 'operation': '='},
       ],
     ];
 
     TextStyle calculationStyle = TextStyle(
-      color: Colors.white.withOpacity(0.8),
-      fontWeight: FontWeight.bold,
-      fontSize: topSectionFontSize,
+      color: Colors.transparent,
+      fontWeight: FontWeight.w500,
+      fontSize: inputFontSize,
       fontStyle: FontStyle.normal,
-      letterSpacing: 1.0,
-      wordSpacing: 2.0,
-      textBaseline: TextBaseline.alphabetic,
+      letterSpacing: 1.5,
       height: 1.35,
+      wordSpacing: 1,
     );
 
     return Scaffold(
-      // appBar: AppBar(),
+      appBar: AppBar(),
       body: Container(
-        height: double.infinity,
         padding: EdgeInsets.symmetric(horizontal: horPadding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
-          // crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Container(
-              alignment: Alignment.bottomRight,
-              height: topSectionSize,
-              child: SingleChildScrollView(
-                reverse: true,
-                scrollDirection: Axis.vertical,
-                child: TextField(
-                  textAlign: TextAlign.right,
-                  controller: controller,
-                  // readOnly: true,
-                  showCursor: true,
-                  autofocus: true,
-                  maxLines: null,
-                  keyboardType: TextInputType.none,
-                  textInputAction: TextInputAction.newline,
-                  style: calculationStyle,
-                  decoration: const InputDecoration(
-                    contentPadding: EdgeInsets.zero,
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
+            Column(
+              children: [
+                SizedBox(
+                  height: screenHeight * 0.2,
+                  width: double.infinity,
+                  child: Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.only(right: 3),
+                        width: double.infinity,
+                        child: RichText(
+                          textAlign: TextAlign.right,
+                          maxLines: null,
+                          text: TextSpan(
+                            style: TextStyle(
+                              fontSize: inputFontSize,
+                              color: Colors.white.withOpacity(0.8),
+                              letterSpacing: 1.5,
+                              height: 1.35,
+                              fontWeight: FontWeight.w500,
+                              wordSpacing: 1,
+                            ),
+                            children: List.from(inputSpans),
+                          ),
+                        ),
+                      ),
+                      TextField(
+                        textAlign: TextAlign.right,
+                        controller: controller,
+                        showCursor: true,
+                        autofocus: true,
+                        keyboardType: TextInputType.none,
+                        maxLines: null,
+                        style: calculationStyle,
+                        decoration: const InputDecoration(
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ),
-            Container(
-              height: screenHeight * 0.08,
-              alignment: Alignment.centerRight,
-              child: finalResult != null
-                  ? SelectableText(
-                      commafy(finalResult!, context),
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.5),
-                        fontWeight: FontWeight.bold,
-                        fontSize: resultFontSize,
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
+                SizedBox(height: screenHeight * 0.005),
+                Container(
+                  height: screenHeight * 0.05,
+                  alignment: Alignment.centerRight,
+                  child: finalResult != null
+                      ? SelectableText(
+                          finalResult!,
+                          textAlign: TextAlign.end,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.5),
+                            fontWeight: FontWeight.w500,
+                            fontSize: resultFontSize,
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                ),
+              ],
+            ), //topSectoin
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -192,10 +231,10 @@ class _HomePageState extends State<HomePage> {
                 MyTap(
                   borderRadius: 6,
                   onTap: () {
-                    logic(
-                      buttonType: 'remove',
+                    inputFormatter(
+                      buttonType: 'erase',
                       horPadding: horPadding,
-                      input: '',
+                      newValue: '',
                       screenWidth: screenWidth,
                       style: calculationStyle,
                     );
@@ -212,8 +251,10 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
-            Divider(color: Colors.white.withOpacity(0.1), thickness: screenHeight * 0.001),
-            SizedBox(height: screenHeight * 0.01),
+
+            Divider(thickness: screenHeight * 0.0005, color: Colors.white54),
+            SizedBox(height: screenHeight * 0.02),
+
             showhistory
                 ? SizedBox(
                     height: bottomSection,
@@ -227,21 +268,21 @@ class _HomePageState extends State<HomePage> {
                             reverse: true,
                             itemCount: history.length,
                             itemBuilder: (BuildContext context, int index) {
-                              history = history.reversed.toList();
+                              // history = history.reversed.toList();
 
-                              String calculation = history[index]['calculation'];
-                              String result = history[index]['result'];
+                              String calculation = history[history.length - 1 - index]['calculation'];
+                              String result = history[history.length - 1 - index]['result'];
 
-                              TextStyle calculationsStyle = TextStyle(
+                              TextStyle historyCalculationsStyle = TextStyle(
                                 color: Colors.white.withOpacity(0.6),
-                                fontWeight: FontWeight.bold,
-                                fontSize: screenHeight * 0.02,
+                                fontWeight: FontWeight.w500,
+                                fontSize: screenWidth * 0.045,
                               );
 
-                              TextStyle resultStyle = TextStyle(
-                                color: Colors.white.withOpacity(0.8),
-                                fontWeight: FontWeight.bold,
-                                fontSize: screenHeight * 0.024,
+                              TextStyle historyResultStyle = TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.w500,
+                                fontSize: screenWidth * 0.05,
                               );
 
                               return Column(
@@ -250,36 +291,36 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   MyTap(
                                     onTap: () {
-                                      logic(
-                                        buttonType: 'history',
-                                        input: calculation,
-                                        style: calculationsStyle,
-                                        screenWidth: screenWidth,
+                                      inputFormatter(
+                                        buttonType: 'pasting',
                                         horPadding: horPadding,
+                                        newValue: calculation,
+                                        screenWidth: screenWidth,
+                                        style: calculationStyle,
                                       );
                                     },
                                     child: Text(
                                       calculation,
                                       maxLines: null,
                                       textAlign: TextAlign.end,
-                                      style: calculationsStyle,
+                                      style: historyCalculationsStyle,
                                     ),
                                   ),
                                   SizedBox(height: screenHeight * 0.004),
                                   MyTap(
                                     onTap: () {
-                                      logic(
-                                        buttonType: 'history',
-                                        input: result,
-                                        style: calculationsStyle,
-                                        screenWidth: screenWidth,
+                                      inputFormatter(
+                                        buttonType: 'pasting',
                                         horPadding: horPadding,
+                                        newValue: result,
+                                        screenWidth: screenWidth,
+                                        style: calculationStyle,
                                       );
                                     },
                                     child: Text(
-                                      result,
+                                      '=$result',
                                       textAlign: TextAlign.end,
-                                      style: resultStyle,
+                                      style: historyResultStyle,
                                     ),
                                   ),
                                   Divider(
@@ -306,7 +347,7 @@ class _HomePageState extends State<HomePage> {
                               'Clear history',
                               style: TextStyle(
                                 color: Colors.green,
-                                fontSize: screenHeight * 0.02,
+                                fontSize: screenWidth * 0.045,
                               ),
                             ),
                           ),
@@ -316,7 +357,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   )
                 : SizedBox(
-                    height: bottomSection,
+                    height: bottomSection, // 50% of the screen
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -337,14 +378,31 @@ class _HomePageState extends State<HomePage> {
 
                                     return MyTap(
                                       borderRadius: availableWidth * 0.03,
-                                      onTap: () {
-                                        return logic(
-                                          buttonType: buttonType,
-                                          horPadding: horPadding,
-                                          input: buttonOpr,
-                                          screenWidth: screenWidth,
-                                          style: calculationStyle,
-                                        );
+                                      onTap: () async {
+                                        if (buttonType == 'clear') {
+                                          controller.text = "";
+                                          finalResult = null;
+                                          controller.selection = const TextSelection.collapsed(offset: 0);
+                                          inputSpans = [];
+
+                                          setState(() {});
+                                        } else if (buttonType == 'equal') {
+                                          if (finalResult != null) {
+                                            await saveInHistory(controller.text, finalResult!);
+                                            controller.text = finalResult!;
+                                            controller.selection = TextSelection.collapsed(offset: controller.text.length);
+                                            finalResult = null;
+                                            setState(() {});
+                                          }
+                                        } else {
+                                          inputFormatter(
+                                            buttonType: buttonType,
+                                            horPadding: horPadding,
+                                            newValue: buttonOpr,
+                                            screenWidth: screenWidth,
+                                            style: calculationStyle,
+                                          );
+                                        }
                                       },
                                       child: Container(
                                         height: availableHeight / 5,
@@ -366,126 +424,159 @@ class _HomePageState extends State<HomePage> {
                         SizedBox(height: bottomPadding),
                       ],
                     ),
-                  )
+                  ), //bottom section
           ],
         ),
       ),
     );
   }
 
-  logic({required buttonType, required String input, required TextStyle style, required screenWidth, required horPadding}) {
-    if (buttonType == 'clear') {
-      controller.text = "";
-      // must set cursor ofset 0 after controller.text updates
-      controller.selection = const TextSelection.collapsed(offset: 0);
-      finalResult = null;
-    } else if (buttonType == 'equal') {
-      List calculations = listify(controller.text, operators);
-      if (calculations.length <= 1) {
-      } else if (finalResult != null) {
-        String calculation = controller.text;
-        finalResult = commafy(finalResult!, context);
-        controller.text = finalResult!;
-        saveInHistory(calculation, finalResult!);
+  void inputFormatter({required buttonType, required String newValue, required TextStyle style, required screenWidth, required horPadding}) {
+    String inputText = controller.text;
 
-        finalResult = null;
-        controller.selection = TextSelection.collapsed(offset: controller.text.length);
-      } else {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        const snackBar = SnackBar(content: Center(child: Text("Invalid format")));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    int initialInputLenght = inputText.length; // before format inputtext length
+
+    int cursorPositionStart = controller.selection.start;
+    int cursorPositionEnd = controller.selection.end;
+
+    if (buttonType == 'erase') {
+      if (cursorPositionStart == cursorPositionEnd) {
+        cursorPositionStart = cursorPositionStart - 1;
       }
-    } else {
-      TextSelection currentSelection = controller.selection;
-      int position = currentSelection.baseOffset;
-
-      String text = controller.text;
-
-      String prefix = text.substring(0, position);
-      String suffix = text.substring(position, text.length);
-
-      // removing previous operator if followed by another operator
-      if (buttonType == 'oper') {
-        prefix = removeEndingOperator(prefix, operators);
-        suffix = removeStartingOperator(suffix, operators);
-      }
-
-      if (input == "%" && prefix.endsWith('%')) {
-        input = "";
-      }
-
-      if (input == ".") {
-        if (prefix.isEmpty || operators.any((operator) => prefix.endsWith(operator))) {
-          input = "0.";
-        }
-      }
-
-      //adding * before right bracket if followed by a number
-      if (input == '(') {
-        if (prefix.isNotEmpty && !operators.any((operator) => prefix.endsWith(operator))) {
-          input = '×$input';
-        }
-      }
-
-      if (buttonType == 'remove') {
-        if (prefix.isNotEmpty) {
-          prefix = prefix.substring(0, prefix.length - (prefix.endsWith(',') ? 2 : 1));
-          text = prefix + suffix; //if ends with , remove 2 chars
-        }
-      } else {
-        text = prefix + input + suffix;
-      }
-
-      int intialLength = text.length;
-
-      text = text.replaceAll('\n', '');
-      text = text.replaceAll(',', ''); //removing all commas
-      List listed = listify(text, operators + secondaryOperators); //seperating calcs into list
-      text = listed.map((i) => checkDecimal(i)).join(); //removing secondary decimal dots
-
-      if (listed.length >= 3) {
-        //CALCULATION LOGIC
-        finalResult = calculate(text);
-        setState(() {});
-      } else {
-        finalResult = null;
-        setState(() {});
-      }
-
-      listed = listify(text, operators + secondaryOperators); //seperating calcs into list
-
-      List newlisted = [];
-      String newpair = "";
-      for (String i in listed) {
-        if (buttonType != 'remove') {
-          if (!isValidString(i, context)) {
-            //removing the last i if length more than 15 or after decimal point more than 10
-            i = i.substring(0, i.length - 1);
-          }
-        }
-
-        if (operators.contains(i) || secondaryOperators.contains(i)) {
-          newlisted.add(newpair);
-          newpair = i;
-        } else {
-          newpair = newpair + commafy(i, context);
-        }
-      }
-      newlisted.add(newpair);
-
-      text = breakIntoLines(
-        calculationStyle: style,
-        newlisted: newlisted,
-        screenWidth: screenWidth,
-        horPadding: horPadding,
-      );
-
-      int processedLength = text.length;
-
-      controller.text = text;
-      controller.selection = TextSelection.collapsed(offset: prefix.length + input.length - (intialLength - processedLength));
     }
 
-    setState(() {});
+    String prefix = inputText.substring(0, cursorPositionStart);
+    String suffix = inputText.substring(cursorPositionEnd, inputText.length);
+
+    //adding 0 in front of . if folled by no value
+    if (newValue == ".") {
+      if (prefix.isEmpty || operators.any((operator) => prefix.endsWith(operator))) {
+        newValue = "0.";
+      }
+    }
+
+    //adding * before right bracket if followed by a number
+    if (newValue == '(') {
+      if (prefix.isNotEmpty && !operators.any((operator) => prefix.endsWith(operator))) {
+        newValue = '×$newValue';
+      }
+    }
+
+    // removing previous operator if followed by another operator
+    if (buttonType == 'oper') {
+      prefix = removeEndingOperator(prefix, mathOperators);
+      suffix = removeStartingOperator(suffix, mathOperators);
+    }
+
+    inputText = prefix + newValue + suffix;
+
+    inputText = inputText.replaceAll(',', '');
+    inputText = inputText.replaceAll('\n', '');
+
+    // seperating operators and numbers
+    List<String> listedInput = [];
+    String currentNumber = '';
+    for (int i = 0; i < inputText.length; i++) {
+      String currentChar = inputText[i];
+      if (operators.contains(currentChar)) {
+        if (currentNumber.isNotEmpty) {
+          listedInput.add(currentNumber);
+          currentNumber = '';
+        }
+        listedInput.add(currentChar);
+      } else {
+        currentNumber += currentChar;
+      }
+    }
+    listedInput.add(currentNumber);
+
+    if (listedInput.length >= 3) {
+      //CALCULATION LOGIC
+      double? result = calculate(inputText);
+      if (result != null) {
+        finalResult = NumberFormat('#,###.#########').format(result);
+
+        if (finalResult!.length >= 15) {
+          finalResult = result.toStringAsExponential(10);
+        }
+        setState(() {});
+      }
+    } else {
+      finalResult = null;
+      setState(() {});
+    }
+
+    // formatting inputText as #,###
+    List commafiedListedInput = [];
+    for (String i in listedInput) {
+      if (operators.contains(i)) {
+        commafiedListedInput.add(i);
+      } else {
+        i = decimalChecker(i); // keeping only one decimal point
+
+        if (i.endsWith('.')) {
+          double? number = double.tryParse(i);
+          if (number != null) {
+            i = NumberFormat('#,###.#########').format(number);
+            commafiedListedInput.add(i + '.');
+          }
+        } else {
+          double? number = double.tryParse(i);
+          if (number != null) {
+            i = NumberFormat('#,###.#########').format(number);
+
+            commafiedListedInput.add(i);
+          }
+        }
+      }
+    }
+
+    //pairing number and operator in order to make them one item
+    List pairedListed = [];
+    String newpair = "";
+    for (String i in commafiedListedInput) {
+      if (buttonType != 'remove') {
+        if (!isValidString(i, context)) {
+          //removing the last i if length more than 15 or after decimal point more than 10
+          i = i.substring(0, i.length - 1);
+        }
+      }
+
+      if (mathOperators.contains(i)) {
+        pairedListed.add(newpair);
+        newpair = i;
+      } else {
+        newpair = newpair + i;
+      }
+    }
+    pairedListed.add(newpair);
+
+    //breaking into lines
+    inputText = breakIntoLines(
+      calculationStyle: style,
+      newlisted: pairedListed,
+      screenWidth: screenWidth,
+      horPadding: horPadding,
+    );
+
+    //updating number of lines
+    numberOfLines = '\n'.allMatches(inputText).length;
+
+    // inputSpans.clear();
+    // for (int i = 0; i < inputText.length; i++) {
+    //   if (operators.contains(inputText[i])) {
+    //     inputSpans.add(TextSpan(text: inputText[i], style: const TextStyle(color: Colors.green)));
+    //   } else {
+    //     inputSpans.add(TextSpan(text: inputText[i]));
+    //   }
+    // }
+    // setState(() {});
+
+    int currentInputLength = inputText.length; //after format inputtext length
+
+    controller.value = TextEditingValue(
+      text: inputText,
+      selection: TextSelection.collapsed(offset: cursorPositionEnd + (currentInputLength - initialInputLenght)),
+    );
   }
 }
