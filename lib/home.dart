@@ -22,8 +22,6 @@ class _HomePageState extends State<HomePage> {
 
   String? finalResult;
 
-  int numberOfLines = 1;
-
   List history = [];
   bool showhistory = false;
 
@@ -328,9 +326,9 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                   Divider(
-                                    color: Colors.white.withOpacity(0.03),
-                                    thickness: screenHeight * 0.001,
-                                    height: screenHeight * 0.03,
+                                    color: Colors.white.withOpacity(0.05),
+                                    thickness: screenHeight * 0.002,
+                                    height: screenHeight * 0.05,
                                   ),
                                 ],
                               );
@@ -442,14 +440,21 @@ class _HomePageState extends State<HomePage> {
   void inputFormatter({required buttonType, required String newValue, required TextStyle style, required screenWidth, required horPadding}) {
     String inputText = controller.text;
 
+    // inputText = inputText.replaceAll('\n', '');
+
     int initialInputLenght = inputText.length; // before format inputtext length
 
     int cursorPositionStart = controller.selection.start;
     int cursorPositionEnd = controller.selection.end;
 
-    if (buttonType == 'erase') {
+    if (buttonType == 'erase' && cursorPositionStart > 0) {
+      int count = 1;
+
       if (cursorPositionStart == cursorPositionEnd) {
-        cursorPositionStart = cursorPositionStart - 1;
+        if (inputText[cursorPositionStart - 1] == '\n') {
+          count = 2; //removing last two if last is \n
+        }
+        cursorPositionStart = cursorPositionStart - count;
       }
     }
 
@@ -478,35 +483,39 @@ class _HomePageState extends State<HomePage> {
 
     inputText = prefix + newValue + suffix;
 
-    inputText = inputText.replaceAll(',', '');
     inputText = inputText.replaceAll('\n', '');
+    inputText = inputText.replaceAll(',', '');
 
-    // seperating operators and numbers
-    List<String> listedInput = [];
-    String currentNumber = '';
-    for (int i = 0; i < inputText.length; i++) {
-      String currentChar = inputText[i];
-      if (operators.contains(currentChar)) {
-        if (currentNumber.isNotEmpty) {
-          listedInput.add(currentNumber);
-          currentNumber = '';
+    List listedInput = listify(inputText, operators);
+
+    if (buttonType != 'remove' && buttonType != 'erase' && !operators.contains(newValue)) {
+      for (String i in listedInput) {
+        if (validateInput(i, context)) {
+          inputText = prefix + suffix;
         }
-        listedInput.add(currentChar);
-      } else {
-        currentNumber += currentChar;
       }
     }
-    listedInput.add(currentNumber);
 
+    listedInput = listify(inputText, operators);
     if (listedInput.length >= 3) {
       //CALCULATION LOGIC
       double? result = calculate(inputText);
-      if (result != null) {
-        finalResult = NumberFormat('#,###.#########').format(result);
 
-        if (finalResult!.length >= 24) {
-          finalResult = result.toStringAsExponential(10);
+      if (result != null) {
+        if (result > 9999999) {
+          finalResult = NumberFormat('#,###.######').format(result);
+        } else {
+          finalResult = NumberFormat('#,###.#########').format(result);
         }
+
+        String formatlessFinalResult = finalResult!.replaceAll(',', '');
+
+        List<String> parts = formatlessFinalResult.split('.');
+        String wholePart = parts[0];
+        if (wholePart.length > 15) {
+          finalResult = result.toStringAsExponential(8);
+        }
+
         setState(() {});
       } else {
         finalResult = null;
@@ -521,20 +530,18 @@ class _HomePageState extends State<HomePage> {
         commafiedListedInput.add(i);
       } else {
         i = decimalChecker(i); // keeping only one decimal point
-        if (i.endsWith('.')) {
-          double? number = double.tryParse(i);
-          if (number != null) {
-            i = NumberFormat('#,###.#########').format(number);
-            commafiedListedInput.add(i + '.');
-          }
-        } else {
-          double? number = double.tryParse(i);
-          if (number != null) {
-            i = NumberFormat('#,###.#########').format(number);
 
-            commafiedListedInput.add(i);
-          }
+        List parts = i.split('.');
+        String wholePart = parts[0];
+        String decimalPart = parts.length > 1 ? ('.' + parts[1]) : "";
+
+        double? number = double.tryParse(wholePart);
+
+        if (number != null) {
+          wholePart = NumberFormat('#,###.#########').format(number);
         }
+
+        commafiedListedInput.add(wholePart + decimalPart);
       }
     }
 
@@ -542,10 +549,6 @@ class _HomePageState extends State<HomePage> {
     List pairedListed = [];
     String newpair = "";
     for (String i in commafiedListedInput) {
-      if (buttonType != 'remove') {
-        i = validateInput(i, operators, context);
-      }
-
       if (mathOperators.contains(i)) {
         pairedListed.add(newpair);
         newpair = i;
@@ -562,9 +565,6 @@ class _HomePageState extends State<HomePage> {
       screenWidth: screenWidth,
       horPadding: horPadding,
     );
-
-    //updating number of lines
-    numberOfLines = '\n'.allMatches(inputText).length;
 
     int currentInputLength = inputText.length; //after format inputtext length
 

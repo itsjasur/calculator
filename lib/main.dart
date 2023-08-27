@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
           behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.white24,
           contentTextStyle: TextStyle(
-            fontSize: screenWidth * 0.038,
+            fontSize: screenWidth * 0.035,
             color: Colors.white,
             fontWeight: FontWeight.w500,
           ),

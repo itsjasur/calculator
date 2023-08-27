@@ -41,32 +41,30 @@ String breakIntoLines({required List newlisted, required double screenWidth, req
   return newText + line;
 }
 
-String validateInput(String input, List operators, BuildContext context) {
-  if (operators.contains(input)) {
-    return input;
-  } else {
-    List<String> parts = input.split('.');
-    String leftSide = parts[0];
-    String rightSide = parts.length > 1 ? parts[1] : ""; // Handling the case if there's no decimal point
+bool validateInput(String input, BuildContext context) {
+  input = input.replaceAll(',', '');
+  input = input.replaceAll('\n', '');
 
-    if (leftSide.length > 15) {
-      leftSide = leftSide.substring(0, leftSide.length - 1);
+  List<String> parts = input.split('.');
+  String leftSide = parts[0];
+  String rightSide = parts.length > 1 ? parts[1] : ""; // Handling the case if there's no decimal point
 
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      const snackBar = SnackBar(content: Center(child: Text("Can't enter more than 15 digits")));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
-    if (rightSide.length >= 9) {
-      rightSide = rightSide.substring(0, rightSide.length - 1);
-      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-      const snackBar = SnackBar(content: Center(child: Text("Can't enter more than 9 digits after decimal point")));
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
+  if (leftSide.length > 15) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    const snackBar = SnackBar(content: Center(child: Text("Can't enter more than 15 digits")));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
-    input = leftSide + (parts.length > 1 ? '.$rightSide' : '');
-
-    return input;
+    return true;
   }
+  if (rightSide.length > 10) {
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    const snackBar = SnackBar(content: Center(child: Text("Can't enter more than 9 digits after decimal point")));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+    return true;
+  }
+
+  return false;
 }
 
 double? calculate(String expression) {
@@ -78,12 +76,12 @@ double? calculate(String expression) {
   try {
     Parser p = Parser();
     Expression exp = p.parse(expression);
-    // print(exp);
 
     ContextModel cm = ContextModel();
     result = exp.evaluate(EvaluationType.REAL, cm);
   } catch (e) {}
 
+  print('aaaaa $result');
   return result;
 }
 
@@ -93,6 +91,7 @@ String removeEndingOperator(String input, List operators) {
       return input.substring(0, input.length - operator.length);
     }
   }
+
   return input;
 }
 
@@ -103,4 +102,25 @@ String removeStartingOperator(String input, List operators) {
     }
   }
   return input;
+}
+
+List listify(String inputText, List operators) {
+  // seperating operators and numbers
+  List<String> listedInput = [];
+  String currentNumber = '';
+  for (int i = 0; i < inputText.length; i++) {
+    String currentChar = inputText[i];
+    if (operators.contains(currentChar)) {
+      if (currentNumber.isNotEmpty) {
+        listedInput.add(currentNumber);
+        currentNumber = '';
+      }
+      listedInput.add(currentChar);
+    } else {
+      currentNumber += currentChar;
+    }
+  }
+  listedInput.add(currentNumber);
+
+  return listedInput;
 }
