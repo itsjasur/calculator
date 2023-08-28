@@ -82,7 +82,7 @@ class _HomePageState extends State<HomePage> {
     final inputFontSize = screenWidth * 0.073;
     final resultFontSize = screenWidth * 0.063;
 
-    Color numberColor = Colors.white70;
+    Color numberColor = Colors.white.withOpacity(0.8);
     final availableHeight = bottomSection - (4 * buttonMargin) - bottomPadding;
     final availableWidth = screenWidth - (2 * horPadding) - (3 * buttonMargin);
 
@@ -156,7 +156,7 @@ class _HomePageState extends State<HomePage> {
                               style: TextStyle(
                                 fontSize: inputFontSize,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withOpacity(0.9),
                                 letterSpacing: 1.5,
                                 height: 1.35,
                                 wordSpacing: 1,
@@ -231,6 +231,15 @@ class _HomePageState extends State<HomePage> {
                 ),
                 MyTap(
                   borderRadius: 6,
+                  onLongPress: () {
+                    inputFormatter(
+                      buttonType: 'erase',
+                      horPadding: horPadding,
+                      newValue: '',
+                      screenWidth: screenWidth,
+                      style: calculationStyle,
+                    );
+                  },
                   onTap: () {
                     inputFormatter(
                       buttonType: 'erase',
@@ -483,9 +492,6 @@ class _HomePageState extends State<HomePage> {
 
     inputText = prefix + newValue + suffix;
 
-    inputText = inputText.replaceAll('\n', '');
-    inputText = inputText.replaceAll(',', '');
-
     List listedInput = listify(inputText, operators);
 
     if (buttonType != 'remove' && buttonType != 'erase' && !operators.contains(newValue)) {
@@ -495,6 +501,9 @@ class _HomePageState extends State<HomePage> {
         }
       }
     }
+
+    inputText = inputText.replaceAll('\n', '');
+    inputText = inputText.replaceAll(',', '');
 
     listedInput = listify(inputText, operators);
     if (listedInput.length >= 3) {
