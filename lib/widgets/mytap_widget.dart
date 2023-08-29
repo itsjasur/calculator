@@ -35,7 +35,7 @@ class _MyTapState extends State<MyTap> with SingleTickerProviderStateMixin {
   void _startLongPressAction() {
     if (widget.onLongPress != null) {
       _longPressTimer = Timer.periodic(const Duration(milliseconds: 130), (timer) {
-        Vibration.vibrate(duration: 10, amplitude: 200);
+        Vibration.vibrate(duration: 10, amplitude: 50);
         widget.onLongPress!();
       });
     }
@@ -60,7 +60,7 @@ class _MyTapState extends State<MyTap> with SingleTickerProviderStateMixin {
         highlightColor: Colors.white10,
         borderRadius: BorderRadius.circular(widget.borderRadius),
         onTap: () {
-          Vibration.vibrate(duration: 10, amplitude: 200);
+          Vibration.vibrate(duration: 10, amplitude: 50);
           if (widget.onTap != null) widget.onTap!();
         },
         // onLongPress: _startLongPressAction,

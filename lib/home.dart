@@ -224,7 +224,7 @@ class _HomePageState extends State<HomePage> {
                     width: screenWidth * 0.15,
                     height: screenHeight * 0.04,
                     child: Image.asset(
-                      showhistory ? 'lib/icons/history.png' : 'lib/icons/calculator.png',
+                      showhistory ? 'lib/icons/calculator.png' : 'lib/icons/history.png',
                       color: Colors.white60,
                     ),
                   ),
