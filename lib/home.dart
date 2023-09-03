@@ -273,6 +273,8 @@ class _HomePageState extends State<HomePage> {
                                 fontSize: screenWidth * 0.07,
                               );
 
+                              //
+
                               return Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.end,
