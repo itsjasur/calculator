@@ -253,7 +253,6 @@ class _HomePageState extends State<HomePage> {
                         Expanded(
                           child: ListView.builder(
                             padding: EdgeInsets.zero,
-                            // shrinkWrap: true,
                             reverse: true,
                             itemCount: history.length,
                             itemBuilder: (BuildContext context, int index) {
