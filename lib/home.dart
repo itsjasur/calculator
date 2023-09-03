@@ -80,8 +80,8 @@ class _HomePageState extends State<HomePage> {
     final buttonMargin = screenWidth * 0.03;
     final bottomPadding = bottomSection * 0.03;
     final btnFontSize = screenWidth * 0.073;
-    final inputFontSize = screenWidth * 0.073;
-    final resultFontSize = screenWidth * 0.063;
+    final inputFontSize = screenWidth * 0.08;
+    final resultFontSize = screenWidth * 0.07;
 
     Color numberColor = Colors.white.withOpacity(0.8);
     final availableHeight = bottomSection - (4 * buttonMargin) - bottomPadding;
@@ -126,7 +126,7 @@ class _HomePageState extends State<HomePage> {
       fontWeight: FontWeight.w500,
       fontSize: inputFontSize,
       fontStyle: FontStyle.normal,
-      letterSpacing: 1.5,
+      // letterSpacing: 1.5,
       height: 1.35,
       wordSpacing: 1,
     );
@@ -145,49 +145,22 @@ class _HomePageState extends State<HomePage> {
                   width: double.infinity,
                   child: SingleChildScrollView(
                     reverse: true,
-                    child: Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        // Container(
-                        //   padding: const EdgeInsets.only(right: 3),
-                        //   width: double.infinity,
-                        //   child: RichText(
-                        //     textAlign: TextAlign.right,
-                        //     maxLines: null,
-                        //     text: TextSpan(
-                        //       style: calculationStyle.copyWith(
-                        //         color: Colors.white.withOpacity(0.9),
-                        //       ),
-                        //       // style: TextStyle(
-                        //       //   fontSize: inputFontSize,
-                        //       //   fontWeight: FontWeight.w500,
-                        //       //   color: Colors.white.withOpacity(0.9),
-                        //       //   letterSpacing: 1.5,
-                        //       //   height: 1.35,
-                        //       //   wordSpacing: 1,
-                        //       // ),
-                        //       children: List.from(inputSpans),
-                        //     ),
-                        //   ),
-                        // ),
-                        TextField(
-                          textAlign: TextAlign.right,
-                          controller: controller,
-                          showCursor: true,
-                          autofocus: true,
-                          keyboardType: TextInputType.none,
-                          maxLines: null,
-                          style: calculationStyle,
-                          decoration: const InputDecoration(
-                            isDense: true,
-                            contentPadding: EdgeInsets.zero,
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            disabledBorder: InputBorder.none,
-                          ),
-                        ),
-                      ],
+                    child: TextField(
+                      textAlign: TextAlign.right,
+                      controller: controller,
+                      showCursor: true,
+                      autofocus: true,
+                      keyboardType: TextInputType.none,
+                      maxLines: null,
+                      style: calculationStyle,
+                      decoration: const InputDecoration(
+                        // isDense: true,
+                        contentPadding: EdgeInsets.zero,
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                      ),
                     ),
                   ),
                 ),
@@ -292,13 +265,13 @@ class _HomePageState extends State<HomePage> {
                               TextStyle historyCalculationsStyle = TextStyle(
                                 color: Colors.white.withOpacity(0.6),
                                 fontWeight: FontWeight.w500,
-                                fontSize: screenWidth * 0.055,
+                                fontSize: screenWidth * 0.06,
                               );
 
                               TextStyle historyResultStyle = TextStyle(
                                 color: Colors.green,
                                 fontWeight: FontWeight.w500,
-                                fontSize: screenWidth * 0.06,
+                                fontSize: screenWidth * 0.07,
                               );
 
                               return Column(
@@ -395,7 +368,9 @@ class _HomePageState extends State<HomePage> {
                                     return MyTap(
                                       borderRadius: availableWidth * 0.03,
                                       onTap: () async {
-                                        equalClicked = false;
+                                        setState(() {
+                                          equalClicked = false;
+                                        });
                                         if (buttonType == 'clear') {
                                           controller.text = "";
                                           finalResult = null;
