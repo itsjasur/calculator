@@ -1,7 +1,8 @@
 import 'dart:async';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:vibration/vibration.dart';
+import 'package:flutter/services.dart';
+import 'dart:io' show Platform;
 
 class MyTap extends StatefulWidget {
   final Widget child;
@@ -35,7 +36,12 @@ class _MyTapState extends State<MyTap> with SingleTickerProviderStateMixin {
   void _startLongPressAction() {
     if (widget.onLongPress != null) {
       _longPressTimer = Timer.periodic(const Duration(milliseconds: 130), (timer) {
-        Vibration.vibrate(duration: 10, amplitude: 50);
+        if (Platform.isIOS) {
+          SystemSound.play(SystemSoundType.click);
+        }
+
+        HapticFeedback.lightImpact();
+        // Vibration.vibrate(duration: 10, amplitude: 50);
         widget.onLongPress!();
       });
     }
@@ -60,10 +66,12 @@ class _MyTapState extends State<MyTap> with SingleTickerProviderStateMixin {
         highlightColor: Colors.white10,
         borderRadius: BorderRadius.circular(widget.borderRadius),
         onTap: () {
-          Vibration.vibrate(duration: 10, amplitude: 50);
           if (widget.onTap != null) widget.onTap!();
+          HapticFeedback.lightImpact();
+          if (Platform.isIOS) {
+            SystemSound.play(SystemSoundType.click);
+          }
         },
-        // onLongPress: _startLongPressAction,
         onTapDown: (details) {
           _controller.forward();
           _startLongPressAction();

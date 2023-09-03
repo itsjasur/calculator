@@ -1,10 +1,8 @@
 import 'dart:convert';
-
 import 'package:calculator/widgets/mytap_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'models/formatters.dart';
 
 class HomePage extends StatefulWidget {
@@ -25,7 +23,9 @@ class _HomePageState extends State<HomePage> {
   List history = [];
   bool showhistory = false;
 
-  List<TextSpan> inputSpans = [];
+  bool equalClicked = false;
+
+  // List<TextSpan> inputSpans = [];
 
   List operators = ['+', '-', '÷', '×', '*', '/', '%', '(', ')'];
   List mathOperators = ['+', '-', '÷', '×', '*', '/'];
@@ -33,17 +33,18 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    controller.addListener(() {
-      inputSpans.clear();
-      for (int i = 0; i < controller.text.length; i++) {
-        if (operators.contains(controller.text[i])) {
-          inputSpans.add(TextSpan(text: controller.text[i], style: const TextStyle(color: Colors.green)));
-        } else {
-          inputSpans.add(TextSpan(text: controller.text[i]));
-        }
-      }
-      setState(() {});
-    });
+    // controller.addListener(() {
+
+    //   // inputSpans.clear();
+    //   // for (int i = 0; i < controller.text.length; i++) {
+    //   //   if (operators.contains(controller.text[i])) {
+    //   //     inputSpans.add(TextSpan(text: controller.text[i], style: const TextStyle(color: Colors.green)));
+    //   //   } else {
+    //   //     inputSpans.add(TextSpan(text: controller.text[i]));
+    //   //   }
+    //   // }
+    //   setState(() {});
+    // });
   }
 
   Future fetchHistory() async {
@@ -120,7 +121,8 @@ class _HomePageState extends State<HomePage> {
     ];
 
     TextStyle calculationStyle = TextStyle(
-      color: Colors.transparent,
+      // color: Colors.transparent,
+      color: equalClicked ? Colors.green : Colors.white.withOpacity(0.9),
       fontWeight: FontWeight.w500,
       fontSize: inputFontSize,
       fontStyle: FontStyle.normal,
@@ -146,25 +148,28 @@ class _HomePageState extends State<HomePage> {
                     child: Stack(
                       alignment: Alignment.bottomRight,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.only(right: 3),
-                          width: double.infinity,
-                          child: RichText(
-                            textAlign: TextAlign.right,
-                            maxLines: null,
-                            text: TextSpan(
-                              style: TextStyle(
-                                fontSize: inputFontSize,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white.withOpacity(0.9),
-                                letterSpacing: 1.5,
-                                height: 1.35,
-                                wordSpacing: 1,
-                              ),
-                              children: List.from(inputSpans),
-                            ),
-                          ),
-                        ),
+                        // Container(
+                        //   padding: const EdgeInsets.only(right: 3),
+                        //   width: double.infinity,
+                        //   child: RichText(
+                        //     textAlign: TextAlign.right,
+                        //     maxLines: null,
+                        //     text: TextSpan(
+                        //       style: calculationStyle.copyWith(
+                        //         color: Colors.white.withOpacity(0.9),
+                        //       ),
+                        //       // style: TextStyle(
+                        //       //   fontSize: inputFontSize,
+                        //       //   fontWeight: FontWeight.w500,
+                        //       //   color: Colors.white.withOpacity(0.9),
+                        //       //   letterSpacing: 1.5,
+                        //       //   height: 1.35,
+                        //       //   wordSpacing: 1,
+                        //       // ),
+                        //       children: List.from(inputSpans),
+                        //     ),
+                        //   ),
+                        // ),
                         TextField(
                           textAlign: TextAlign.right,
                           controller: controller,
@@ -390,11 +395,12 @@ class _HomePageState extends State<HomePage> {
                                     return MyTap(
                                       borderRadius: availableWidth * 0.03,
                                       onTap: () async {
+                                        equalClicked = false;
                                         if (buttonType == 'clear') {
                                           controller.text = "";
                                           finalResult = null;
                                           controller.selection = const TextSelection.collapsed(offset: 0);
-                                          inputSpans = [];
+                                          // inputSpans = [];
 
                                           setState(() {});
                                         } else if (buttonType == 'equal') {
@@ -403,6 +409,7 @@ class _HomePageState extends State<HomePage> {
                                             const snackBar = SnackBar(content: Center(child: Text("Invalid format")));
                                             ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                           } else if (finalResult != null) {
+                                            equalClicked = true;
                                             await saveInHistory(controller.text, finalResult!);
                                             controller.text = finalResult!;
                                             controller.selection = TextSelection.collapsed(offset: controller.text.length);

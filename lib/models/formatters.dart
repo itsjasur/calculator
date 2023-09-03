@@ -79,9 +79,9 @@ double? calculate(String expression) {
 
     ContextModel cm = ContextModel();
     result = exp.evaluate(EvaluationType.REAL, cm);
-  } catch (e) {}
-
-  print('aaaaa $result');
+  } catch (e) {
+    result = null;
+  }
   return result;
 }
 
